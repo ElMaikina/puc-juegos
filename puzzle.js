@@ -1,18 +1,23 @@
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+// Area donde ocurre el movimiento del personaje
+const gameCanvas = document.getElementById("game");
+const gameContext = gameCanvas.getContext("2d");
 
+// El tamano de las celdas del juego
 const gridSize = 15;
-const cellSize = canvas.width / gridSize;
+const cellSize = gameCanvas.width / gridSize;
 let level = 1;
 
+// El jugador empieza desde el centro del mapa
 let x = Math.floor(gridSize / 2);
 let y = Math.floor(gridSize / 2);
+
+// El rastro celeste que deja el jugador
 const path = [{ x, y }];
 
-//para nivel 15
+// El nivel 15 tiene controles aleatorios
 let randomControlMap = null;
 
-
+// Muestra el nivel actual en la vista superior
 document.getElementById("info").textContent = `Nivel ${level} - ${getControlType(level)}`;
 draw();
 
@@ -115,30 +120,30 @@ function getControlType(lvl) {
 }
 
 function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
   // Dibujar grid
-  ctx.strokeStyle = "#ccc";
+  gameContext.strokeStyle = "#ccc";
   for (let i = 0; i <= gridSize; i++) {
-    ctx.beginPath();
-    ctx.moveTo(i * cellSize, 0);
-    ctx.lineTo(i * cellSize, canvas.height);
-    ctx.stroke();
+    gameContext.beginPath();
+    gameContext.moveTo(i * cellSize, 0);
+    gameContext.lineTo(i * cellSize, gameCanvas.height);
+    gameContext.stroke();
 
-    ctx.beginPath();
-    ctx.moveTo(0, i * cellSize);
-    ctx.lineTo(canvas.width, i * cellSize);
-    ctx.stroke();
+    gameContext.beginPath();
+    gameContext.moveTo(0, i * cellSize);
+    gameContext.lineTo(gameCanvas.width, i * cellSize);
+    gameContext.stroke();
   }
 
   // Dibujar trayectoria
-  ctx.fillStyle = "#3498db";
+  gameContext.fillStyle = "#3498db";
   path.forEach(pos => {
-    ctx.fillRect(pos.x * cellSize, pos.y * cellSize, cellSize, cellSize);
+    gameContext.fillRect(pos.x * cellSize, pos.y * cellSize, cellSize, cellSize);
   });
 
   // Punto inicial
-  ctx.fillStyle = "#e74c3c";
-  ctx.fillRect(Math.floor(gridSize / 2) * cellSize, Math.floor(gridSize / 2) * cellSize, cellSize, cellSize);
+  gameContext.fillStyle = "#e74c3c";
+  gameContext.fillRect(Math.floor(gridSize / 2) * cellSize, Math.floor(gridSize / 2) * cellSize, cellSize, cellSize);
 }
 
 document.getElementById("reset").addEventListener("click", () => {
