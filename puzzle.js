@@ -400,9 +400,8 @@ document.addEventListener("keydown", (e) => {
   // Avanza al siguiente nivel con Enter
   if (e.key === "Enter") {
     if (level < levels.length) {
-      if (checkPath(path, currLevel, startingPoint)) {
+      if (checkPath(path, currLevel, startingPoint) == true) {
         level++;
-        currLevel.lenth = 0;
         currLevel = levels[level]
 
         x = y = Math.floor(gridSize / 2);
@@ -417,7 +416,7 @@ document.addEventListener("keydown", (e) => {
         document.getElementById("info").textContent = `Nivel ${level} - ${getControlType(level)}`;
         draw();
       } 
-      if (!checkPath(path, currLevel, startingPoint)) {
+      else if (!checkPath(path, currLevel, startingPoint)) {
         alert("¡Camino incorrecto, empieza de nuevo!");
         x = y = Math.floor(gridSize / 2);
         path.length = 0;
@@ -501,6 +500,13 @@ function checkPath(path, currLevel, startingPoint) {
   let offX = startingPoint[0] - path[0].x;
   let offY = startingPoint[1] - path[0].y;
 
+    // Limpia la pantalla a mano porque no funciona bien
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
+      pathMatrix[x][y] = 0;
+    }
+  }
+
   path.forEach(pos => {
     let newX = pos.x + offX;
     let newY = pos.y + offY;
@@ -516,27 +522,33 @@ function checkPath(path, currLevel, startingPoint) {
   // Sobreescribe la posicion inicial con un dos
   let newX = path[0].x + offX;
   let newY = path[0].y + offY;
+
   if (newX < gridSize && newY < gridSize && 
         newX >= 0 && newY >= 0 ) {
     pathMatrix[newY][newX] = 2;
   }
 
-  if (JSON.stringify(currLevel) === JSON.stringify(pathMatrix)) {
+  if (JSON.stringify(currLevel) == JSON.stringify(pathMatrix)) {
     console.log("Los caminos son iguales");
     return true;
   }
-  console.log("Los caminos son distintos");
-  console.log("Camino a seguir: " + JSON.stringify(currLevel));
-  console.log("Camino seguido: " + JSON.stringify(pathMatrix));
-  return false;
+  
+  else if (JSON.stringify(currLevel) != JSON.stringify(pathMatrix)) {
+    console.log("Los caminos son distintos");
+    console.log("Camino a seguir: " + JSON.stringify(currLevel));
+    console.log("Camino seguido: " + JSON.stringify(pathMatrix));
+    console.log("Offset en X: " + JSON.stringify(offX));
+    console.log("Offset en Y: " + JSON.stringify(offY));
+    return false;
+  }
 }
 
 function draw() {
   gameContext.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
   
   // Limpia la pantalla a mano porque no funciona bien
-  for (let y = 0; y <= gridSize; y++) {
-    for (let x = 0; x <= gridSize; x++) {
+  for (let y = 0; y < gridSize; y++) {
+    for (let x = 0; x < gridSize; x++) {
       levelContext.clearRect(x * cellSize, y * cellSize, cellSize, cellSize);
     }
   }
