@@ -381,11 +381,15 @@ let y = Math.floor(gridSize / 2);
 // El rastro celeste que deja el jugador
 const path = [{ x, y }];
 
+// Cantidad de pasos dados por el jugador
+let steps = 0;
+
 // El nivel 15 tiene controles aleatorios
 let randomControlMap = null;
 
 // Muestra el nivel actual en la vista superior
-document.getElementById("info").textContent = `Nivel ${level} - ${getControlType(level)}`;
+//document.getElementById("info").textContent = `Nivel ${level} - ${getControlType(level)}`;
+document.getElementById("info").textContent = `Nivel ${level}`;
 draw();
 
 document.addEventListener("keydown", (e) => {
@@ -394,6 +398,7 @@ document.addEventListener("keydown", (e) => {
     x = Math.max(0, Math.min(gridSize - 1, x + move.dx));
     y = Math.max(0, Math.min(gridSize - 1, y + move.dy));
     path.push({ x, y });
+    steps++;
     draw();
   }
 
@@ -443,11 +448,11 @@ function getMovement(key, lvl) {
       return normal[key];
     case lvl <= 10:
       return invertDirection(normal[key]);
-    case lvl <= 12:
+    case lvl <= 13:
       return rotateDirection(normal[key], "clockwise");
-    case lvl <= 14:
+    case lvl <= 16:
       return rotateDirection(normal[key], "counter");
-    case lvl === 15:
+    case lvl < 20:
       if (!randomControlMap) {
         randomControlMap = {};
         const directions = Object.values(normal);
@@ -459,8 +464,32 @@ function getMovement(key, lvl) {
         });
       }
       return randomControlMap[key];
-    default:
-      return null;
+    case lvl == 20:
+      if (steps < 22) {
+        return normal[key];
+      }
+      if (steps < 44) {
+        return rotateDirection(normal[key], "counter");
+      }
+      if (steps < 66) {
+        return invertDirection(normal[key]);
+      }
+      if (steps < 88) {
+        return rotateDirection(normal[key], "clockwise");
+      }
+      else {
+        if (!randomControlMap) {
+          randomControlMap = {};
+          const directions = Object.values(normal);
+          const keys = Object.keys(normal);
+          // Mezcla aleatoria
+          const shuffled = directions.sort(() => 0.5 - Math.random());
+          keys.forEach((key, i) => {
+            randomControlMap[key] = shuffled[i];
+          });
+        }
+        return randomControlMap[key];
+      }
   }
 }
 
@@ -489,9 +518,9 @@ function randomDirection() {
 function getControlType(lvl) {
   if (lvl <= 7) return "Controles normales";
   if (lvl <= 10) return "Controles invertidos";
-  if (lvl <= 12) return "Controles rotados en sentido horario";
-  if (lvl <= 14) return "Controles rotados en sentido antihorario";
-  if (lvl === 15) return "Controles aleatorios";
+  if (lvl <= 13) return "Controles rotados en sentido horario";
+  if (lvl <= 16) return "Controles rotados en sentido antihorario";
+  if (lvl === 20) return "Controles aleatorios";
   return "Fin del juego";
 }
 
@@ -582,7 +611,25 @@ function draw() {
   }
 
   // Dibujar trayectoria
+  const move = getControlType(level);
   gameContext.fillStyle = "#3498db";
+
+  if (move === "Controles normales") {
+    gameContext.fillStyle = "#F8C662";
+  }
+  if (move === "Controles invertidos") {
+    gameContext.fillStyle = " #25344F";
+  }
+  if (move === "Controles rotados en sentido horario") {
+    gameContext.fillStyle = " #BF3556";
+  }
+  if (move === "Controles rotados en sentido antihorario") {
+    gameContext.fillStyle = "#D44220";
+  }
+  if (move === "Controles aleatorios") {
+    gameContext.fillStyle = " #4F583B";
+  }
+
   path.forEach(pos => {
     gameContext.fillRect(pos.x * cellSize, pos.y * cellSize, cellSize, cellSize);
   });
@@ -590,7 +637,7 @@ function draw() {
   for (let y = 0; y < gridSize; y++) {
     for (let x = 0; x < gridSize; x++) {
       if (currLevel[y][x] === 1) {
-        levelContext.fillStyle = "#00ff00";
+        levelContext.fillStyle = "#CCCCCC";
         levelContext.fillRect(x * cellSize / 2, y * cellSize / 2, cellSize / 2, cellSize / 2);
       }
       if (currLevel[y][x] === 2) {
@@ -610,5 +657,6 @@ document.getElementById("reset").addEventListener("click", () => {
   x = y = Math.floor(gridSize / 2);
   path.length = 0;
   path.push({ x, y });
+  steps = 0;
   draw();
 });
