@@ -407,6 +407,7 @@ document.addEventListener("keydown", (e) => {
     if (level < levels.length) {
       if (checkPath(path, currLevel, startingPoint) == true) {
         level++;
+        steps = 0;
         currLevel = levels[level]
 
         x = y = Math.floor(gridSize / 2);
@@ -520,7 +521,24 @@ function getControlType(lvl) {
   if (lvl <= 10) return "Controles invertidos";
   if (lvl <= 13) return "Controles rotados en sentido horario";
   if (lvl <= 16) return "Controles rotados en sentido antihorario";
-  if (lvl === 20) return "Controles aleatorios";
+  if (lvl < 20) return "Controles aleatorios";
+  if (lvl === 20) {
+    if (steps < 22) {
+      return "Controles normales";
+    }
+    if (steps < 44) {
+      return "Controles rotados en sentido antihorario";
+    }
+    if (steps < 66) {
+      return "Controles invertidos";
+    }
+    if (steps < 88) {
+      return "Controles rotados en sentido horario";
+    }
+    else {
+      return "Controles aleatorios";
+    }
+  } 
   return "Fin del juego";
 }
 
@@ -600,13 +618,13 @@ function draw() {
   levelContext.strokeStyle = "#ccc";
   for (let i = 0; i <= gridSize; i++) {
     levelContext.beginPath();
-    levelContext.moveTo(i * cellSize / 2, 0);
-    levelContext.lineTo(i * cellSize / 2, levelCanvas.height);
+    levelContext.moveTo(i * cellSize, 0);
+    levelContext.lineTo(i * cellSize, levelCanvas.height);
     levelContext.stroke();
 
     levelContext.beginPath();
-    levelContext.moveTo(0, i * cellSize / 2);
-    levelContext.lineTo(levelCanvas.width, i * cellSize / 2);
+    levelContext.moveTo(0, i * cellSize);
+    levelContext.lineTo(levelCanvas.width, i * cellSize);
     levelContext.stroke();
   }
 
@@ -638,16 +656,15 @@ function draw() {
     for (let x = 0; x < gridSize; x++) {
       if (currLevel[y][x] === 1) {
         levelContext.fillStyle = "#CCCCCC";
-        levelContext.fillRect(x * cellSize / 2, y * cellSize / 2, cellSize / 2, cellSize / 2);
+        levelContext.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
       }
       if (currLevel[y][x] === 2) {
         levelContext.fillStyle = "#e74c3c";
-        levelContext.fillRect(x * cellSize / 2, y * cellSize / 2, cellSize / 2, cellSize / 2);
+        levelContext.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
         startingPoint = [x,y]
       }
     }
   }
-
   // Punto inicial
   gameContext.fillStyle = "#e74c3c";
   gameContext.fillRect(Math.floor(gridSize / 2) * cellSize, Math.floor(gridSize / 2) * cellSize, cellSize, cellSize);
